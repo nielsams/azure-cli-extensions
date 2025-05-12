@@ -20,18 +20,13 @@ class microsoft_app:
             "Validating Microsoft.app resource type: %s",
             resourceSubType)
 
-        match resourceSubType:
-            case 'containerapps':
-                # Container apps are zone redundant if they are hosted on a
-                # zone redundant managedEnvironment
-                return ZoneRedundancyValidationResult.Dependent
-
-            case 'managedenvironments':
-                # Managed Environments are zone redundant if the zoneRedundant property is set to true
-                # https://learn.microsoft.com/azure/reliability/reliability-azure-container-apps#availability-zone-support
-                if resource['properties'].get('zoneRedundant', {}) is True:
-                    return ZoneRedundancyValidationResult.Yes
-                else:
-                    return ZoneRedundancyValidationResult.No
+        # Container Apps Environments
+        if resourceSubType == 'managedenvironments':
+            # Managed Environments are zone redundant if the zoneRedundant property is set to true
+            # https://learn.microsoft.com/azure/reliability/reliability-azure-container-apps#availability-zone-support
+            if resource['properties'].get('zoneRedundant', {}) is True:
+                return ZoneRedundancyValidationResult.Yes
+            else:
+                return ZoneRedundancyValidationResult.No
 
         return ZoneRedundancyValidationResult.Unknown

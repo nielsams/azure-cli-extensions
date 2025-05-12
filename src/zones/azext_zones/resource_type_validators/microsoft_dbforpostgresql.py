@@ -20,13 +20,12 @@ class microsoft_dbforpostgresql:
             "Validating Microsoft.dbforpostgresql resource type: %s",
             resourceSubType)
 
-        match resourceSubType:
-            case 'flexibleservers':
-
-                if resource['properties'].get('highAvailability', {}).get(
-                        'mode', {}) == 'ZoneRedundant':
-                    return ZoneRedundancyValidationResult.Yes
-                else:
-                    return ZoneRedundancyValidationResult.No
+        # Postgres Flexible Servers
+        if resourceSubType == 'flexibleservers':
+            if resource['properties'].get('highAvailability', {}).get(
+                    'mode', {}) == 'ZoneRedundant':
+                return ZoneRedundancyValidationResult.Yes
+            else:
+                return ZoneRedundancyValidationResult.No
 
         return ZoneRedundancyValidationResult.Unknown

@@ -19,34 +19,27 @@ class microsoft_compute:
         _logger.debug(
             "Validating Microsoft.Compute resource type: %s",
             resourceSubType)
-
-        match resourceSubType:
-            case 'disks':
-                zones = resource.get('zones') or []
-                if len(zones) > 1:
-                    return ZoneRedundancyValidationResult.Yes
-                else:
-                    return ZoneRedundancyValidationResult.No
-
-            case 'virtualmachinescalesets':
-                # VMSS is ZR if deployed to more than one zone
-                zones = resource.get('zones') or []
-                if len(zones) > 1:
-                    return ZoneRedundancyValidationResult.Yes
-                else:
-                    return ZoneRedundancyValidationResult.No
-
-            case 'virtualmachines':
-                # VM is ZR if deployed to more than one zone
-                zones = resource.get('zones') or []
-                if len(zones) > 1:
-                    return ZoneRedundancyValidationResult.Yes
-                else:
-                    return ZoneRedundancyValidationResult.No
-
-            case 'virtualmachines/extensions':
-                # VM extensions are zone redundant if the VM they are attached
-                # to is zone redundant
-                return ZoneRedundancyValidationResult.Dependent
+        
+        # Disks
+        if resourceSubType == 'disks':
+            zones = resource.get('zones') or []
+            return ZoneRedundancyValidationResult.Yes if len(zones) > 1 else ZoneRedundancyValidationResult.No
+            
+        # Virtual Machine Scale Sets
+        if resourceSubType == 'virtualmachinescalesets':
+            # VMSS is ZR if deployed to more than one zone
+            zones = resource.get('zones') or []
+            return ZoneRedundancyValidationResult.Yes if len(zones) > 1 else ZoneRedundancyValidationResult.No
+            
+        # Virtual Machines
+        if resourceSubType == 'virtualmachines':
+            # VM is ZR if deployed to more than one zone
+            zones = resource.get('zones') or []
+            return ZoneRedundancyValidationResult.Yes if len(zones) > 1 else ZoneRedundancyValidationResult.No
+            
+        # VM Extensions
+        if resourceSubType == 'virtualmachines/extensions':
+            # VM extensions are zone redundant if the VM they are attached to is zone redundant
+            return ZoneRedundancyValidationResult.Dependent
 
         return ZoneRedundancyValidationResult.Unknown

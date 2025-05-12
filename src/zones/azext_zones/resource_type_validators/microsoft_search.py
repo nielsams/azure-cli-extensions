@@ -20,15 +20,15 @@ class microsoft_search:
             "Validating Microsoft.search resource type: %s",
             resourceSubType)
 
-        match resourceSubType:
-            case 'searchservices':
-                # Standard or higher tiers in supported regions are zone redundant if the replica count is greater than 1.
-                # https://learn.microsoft.com/azure/search/search-reliability#availability-zone-support
-                sku = resource['sku']['name'] or ''
-                replicaCount = resource['properties'].get('replicaCount', 0)
-                if sku not in ['Free', 'Basic'] and replicaCount > 1:
-                    return ZoneRedundancyValidationResult.Yes
-                else:
-                    return ZoneRedundancyValidationResult.No
+        # Azure Cognitive Search
+        if resourceSubType == 'searchservices':
+            # Standard or higher tiers in supported regions are zone redundant if the replica count is greater than 1.
+            # https://learn.microsoft.com/azure/search/search-reliability#availability-zone-support
+            sku = resource['sku']['name'] or ''
+            replicaCount = resource['properties'].get('replicaCount', 0)
+            if sku not in ['Free', 'Basic'] and replicaCount > 1:
+                return ZoneRedundancyValidationResult.Yes
+            else:
+                return ZoneRedundancyValidationResult.No
 
         return ZoneRedundancyValidationResult.Unknown

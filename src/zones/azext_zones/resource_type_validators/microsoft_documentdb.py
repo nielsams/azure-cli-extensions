@@ -20,24 +20,23 @@ class microsoft_documentdb:
             "Validating Microsoft.documentdb resource type: %s",
             resourceSubType)
 
-        match resourceSubType:
-            case 'databaseaccounts':
-                # https://learn.microsoft.com/en-us/azure/reliability/reliability-cosmos-db-nosql
-                # CosmosDB databases are zone redundant if then have the
-                # setting enabled on the region
-                if resource['properties']['locations'][0]['isZoneRedundant']:
-                    return ZoneRedundancyValidationResult.Yes
-                else:
-                    return ZoneRedundancyValidationResult.No
-
-            case 'mongoClusters':
-                # https://learn.microsoft.com/azure/reliability/reliability-cosmos-mongodb#availability-zone-support
-                highAvailability = \
-                    resource['properties'].get('highAvailability', '')
-                if highAvailability.get(
-                        'targetMode', '') == 'ZoneRedundantPreferred':
-                    return ZoneRedundancyValidationResult.Yes
-                else:
-                    ZoneRedundancyValidationResult.No
+        # DocumentDB Databases
+        if resourceSubType == 'databaseaccounts':
+            zones = resource.get('zones') or []
+            if len(zones) > 1:
+                return ZoneRedundancyValidationResult.Yes
+            else:
+                return ZoneRedundancyValidationResult.No
+                
+        # MongoDB Clusters
+        if resourceSubType == 'mongoclusters':
+            # https://learn.microsoft.com/azure/reliability/reliability-cosmos-mongodb#availability-zone-support
+            highAvailability = \
+                resource['properties'].get('highAvailability', '')
+            if highAvailability.get(
+                    'targetMode', '') == 'ZoneRedundantPreferred':
+                return ZoneRedundancyValidationResult.Yes
+            else:
+                return ZoneRedundancyValidationResult.No
 
         return ZoneRedundancyValidationResult.Unknown

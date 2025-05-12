@@ -20,17 +20,17 @@ class microsoft_botservice:
             "Validating Microsoft.botservice resource type: %s",
             resourceSubType)
 
-        match resourceSubType:
-            case 'botservices':
-                # Bot services are ZR only in west europe and
-                #  only if they are configured as a regional (not global) bot.
-                if resource['location'] == 'westeurope':
-                    # https://learn.microsoft.com/azure/reliability/reliability-bot
-                    _logger.warning(
-                        "Your bot service resource in westeurope may be zone redundant, \
-                        but only if it's configured as a regional (not global) bot. Please check manually.")
-                else:
-                    # Bot services cannot be ZR in any other region
-                    return ZoneRedundancyValidationResult.No
+        # Bot service accounts
+        if resourceSubType == 'botservices':
+            # Bot services are ZR only in west europe and
+            #  only if they are configured as a regional (not global) bot.
+            if resource['location'] == 'westeurope':
+                # https://learn.microsoft.com/azure/reliability/reliability-bot
+                _logger.warning(
+                    "Your bot service resource in westeurope may be zone redundant, \
+                    but only if it's configured as a regional (not global) bot. Please check manually.")
+            else:
+                # Bot services cannot be ZR in any other region
+                return ZoneRedundancyValidationResult.No
 
         return ZoneRedundancyValidationResult.Unknown

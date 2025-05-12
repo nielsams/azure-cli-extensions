@@ -20,8 +20,8 @@ class microsoft_machinelearningservices:
             "Validating Microsoft.machinelearningservices resource type: %s",
             resourceSubType)
 
-        match resourceSubType:
-            case 'workspaces':
-                return ZoneRedundancyValidationResult.Never
+        # Machine Learning Workspaces
+        if resourceSubType == 'workspaces':
+            return ZoneRedundancyValidationResult.Never
 
         return ZoneRedundancyValidationResult.Unknown

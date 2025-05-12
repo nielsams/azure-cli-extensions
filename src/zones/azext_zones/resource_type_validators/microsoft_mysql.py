@@ -20,16 +20,17 @@ class microsoft_mysql:
             "Validating Microsoft.mysql resource type: %s",
             resourceSubType)
 
-        match resourceSubType:
-            case 'flexibleservers':
-                haConfig = resource['properties'].get('highAvailability', {}) \
-                    .get('mode', {})
-                if haConfig == 'ZoneRedundant':
-                    return ZoneRedundancyValidationResult.Yes
-                else:
-                    return ZoneRedundancyValidationResult.No
+        # Flexible Servers
+        if resourceSubType == 'flexibleservers':
+            haConfig = resource['properties'].get('highAvailability', {}) \
+                .get('mode', {})
+            if haConfig == 'ZoneRedundant':
+                return ZoneRedundancyValidationResult.Yes
+            else:
+                return ZoneRedundancyValidationResult.No
 
-            case 'servers':
+        # Single Servers
+        if resourceSubType == 'servers':
                 return ZoneRedundancyValidationResult.No
 
         return ZoneRedundancyValidationResult.Unknown

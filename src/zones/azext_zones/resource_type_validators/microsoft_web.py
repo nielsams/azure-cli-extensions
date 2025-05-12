@@ -20,31 +20,34 @@ class microsoft_web:
             "Validating Microsoft.web resource type: %s",
             resourceSubType)
 
-        match resourceSubType:
-            case 'serverfarms':
-                # App Service Plans are zone redundant if they have zone redundancy enabled and have more than one instance
-                # https://learn.microsoft.com/azure/reliability/reliability-app-service?pivots=free-shared-basic#availability-zone-support
-                zrEnabled = resource['properties'].get('zoneRedundant', False)
-                instanceCount = resource['sku'].get('capacity', 0)
-                if zrEnabled and instanceCount > 1:
-                    return ZoneRedundancyValidationResult.Yes
-                else:
-                    return ZoneRedundancyValidationResult.No
+        # App Service Plans
+        if resourceSubType == 'serverfarms':
+            # App Service Plans are zone redundant if they have zone redundancy enabled and have more than one instance
+            # https://learn.microsoft.com/azure/reliability/reliability-app-service?pivots=free-shared-basic#availability-zone-support
+            zrEnabled = resource['properties'].get('zoneRedundant', False)
+            instanceCount = resource['sku'].get('capacity', 0)
+            if zrEnabled and instanceCount > 1:
+                return ZoneRedundancyValidationResult.Yes
+            else:
+                return ZoneRedundancyValidationResult.No
 
-            case 'sites':
-                # Web Apps are zone redundant if they are hosted on a zone
-                # redundant App Service Plan
-                return ZoneRedundancyValidationResult.Dependent
+        # App Services
+        if resourceSubType == 'sites':
+            # Web Apps are zone redundant if they are hosted on a zone
+            # redundant App Service Plan
+            return ZoneRedundancyValidationResult.Dependent
 
-            case 'hostingenvironments':
-                zrStatus = resource['properties'].get('zoneRedundant', False)
-                if zrStatus:
-                    return ZoneRedundancyValidationResult.Yes
-                else:
-                    return ZoneRedundancyValidationResult.No
+        # Static Web Apps
+        if resourceSubType == 'hostingenvironments':
+            zrStatus = resource['properties'].get('zoneRedundant', False)
+            if zrStatus:
+                return ZoneRedundancyValidationResult.Yes
+            else:
+                return ZoneRedundancyValidationResult.No
 
-            case 'staticsites':
-                # Static Web Apps are always zone redundant
-                return ZoneRedundancyValidationResult.Always
+        # Static Web Apps
+        if resourceSubType =='staticsites':
+            # Static Web Apps are always zone redundant
+            return ZoneRedundancyValidationResult.Always
 
         return ZoneRedundancyValidationResult.Unknown

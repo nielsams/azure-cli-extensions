@@ -20,12 +20,12 @@ class microsoft_operationalinsights:
             "Validating Microsoft.operationalinsights resource type: %s",
             resourceSubType)
 
-        match resourceSubType:
-            case 'workspaces':
-                # Operational Insights workspaces are zone redundant by default,
-                # Note: Operational Insights workspaces are zone redundant by
-                # default only in some regions. Check
-                # https://learn.microsoft.com/azure/azure-monitor/logs/availability-zones.
-                return ZoneRedundancyValidationResult.Always
+        # Log Analytics workspaces
+        if resourceSubType == 'workspaces':
+            # Operational Insights workspaces are zone redundant by default,
+            # Note: Operational Insights workspaces are zone redundant by
+            # default only in some regions. Check
+            # https://learn.microsoft.com/azure/azure-monitor/logs/availability-zones.
+            return ZoneRedundancyValidationResult.Always
 
         return ZoneRedundancyValidationResult.Unknown

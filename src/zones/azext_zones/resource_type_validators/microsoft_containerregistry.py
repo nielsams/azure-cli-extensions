@@ -20,16 +20,17 @@ class microsoft_containerregistry:
             "Validating Microsoft.containerregistry resource type: %s",
             resourceSubType)
 
-        match resourceSubType:
-            case 'registries':
-                # Container registries are zone redundant if the setting enabled
-                # https://learn.microsoft.com/azure/container-registry/zone-redundancy
-                if resource['properties']['zoneRedundancy'] == 'Enabled':
-                    return ZoneRedundancyValidationResult.Yes
-                else:
-                    return ZoneRedundancyValidationResult.No
-
-            case 'registries/replications':
-                return ZoneRedundancyValidationResult.Dependent
+        # Container Registries
+        if resourceSubType == 'registries':
+            # Container registries are zone redundant if the setting enabled
+            # https://learn.microsoft.com/azure/container-registry/zone-redundancy
+            if resource['properties']['zoneRedundancy'] == 'Enabled':
+                return ZoneRedundancyValidationResult.Yes
+            else:
+                return ZoneRedundancyValidationResult.No
+            
+        # Container Registry Replications
+        if resourceSubType == 'registries/replications':
+            return ZoneRedundancyValidationResult.Dependent
 
         return ZoneRedundancyValidationResult.Unknown

@@ -20,30 +20,33 @@ class microsoft_sql:
             "Validating Microsoft.sql resource type: %s",
             resourceSubType)
 
-        match resourceSubType:
-            case 'servers/databases':
-                # https://learn.microsoft.com/azure/azure-sql/database/high-availability-sla-local-zone-redundancy#high-availability-through-zone-redundancy
-                if resource['properties']['zoneRedundant']:
-                    return ZoneRedundancyValidationResult.Yes
-                else:
-                    return ZoneRedundancyValidationResult.No
+        # SQL Databases
+        if resourceSubType == 'servers/databases':
+            # https://learn.microsoft.com/azure/azure-sql/database/high-availability-sla-local-zone-redundancy#high-availability-through-zone-redundancy
+            if resource['properties']['zoneRedundant']:
+                return ZoneRedundancyValidationResult.Yes
+            else:
+                return ZoneRedundancyValidationResult.No
 
-            case 'servers':
-                # Zone Redundancy for SQL is set at the database level, see
-                # above
-                return ZoneRedundancyValidationResult.Dependent
+        # SQL Servers
+        if resourceSubType == 'servers':
+            # Zone Redundancy for SQL is set at the database level, see
+            # above
+            return ZoneRedundancyValidationResult.Dependent
 
-            case 'managedinstances':
-                # SQL MI can be zone redundant if this has been enabled on the resource
-                # https://learn.microsoft.com/azure/azure-sql/managed-instance/high-availability-sla-local-zone-redundancy?view=azuresql#zone-redundant-availability
-                if resource['properties'].get('zoneRedundant', {}) is True:
-                    return ZoneRedundancyValidationResult.Yes
-                else:
-                    return ZoneRedundancyValidationResult.No
+        # SQL Managed Instances
+        if resourceSubType == 'managedinstances':
+            # SQL MI can be zone redundant if this has been enabled on the resource
+            # https://learn.microsoft.com/azure/azure-sql/managed-instance/high-availability-sla-local-zone-redundancy?view=azuresql#zone-redundant-availability
+            if resource['properties'].get('zoneRedundant', {}) is True:
+                return ZoneRedundancyValidationResult.Yes
+            else:
+                return ZoneRedundancyValidationResult.No
 
-            case 'instancepools':
-                # Instance pools depend on the managed instances within them to
-                # be zone redundant
-                return ZoneRedundancyValidationResult.Dependent
+        # SQL Managed Instance Pools
+        if resourceSubType == 'instancepools':
+            # Instance pools depend on the managed instances within them to
+            # be zone redundant
+            return ZoneRedundancyValidationResult.Dependent
 
         return ZoneRedundancyValidationResult.Unknown

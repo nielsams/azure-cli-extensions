@@ -20,9 +20,9 @@ class microsoft_servicebus:
             "Validating Microsoft.servicebus resource type: %s",
             resourceSubType)
 
-        match resourceSubType:
-            case 'namespaces':
-                # servicebus namespaces are always zone redundant
-                return ZoneRedundancyValidationResult.Always
+        # Service Bus Namespaces
+        if resourceSubType == 'namespaces':
+            # servicebus namespaces are always zone redundant
+            return ZoneRedundancyValidationResult.Always
 
         return ZoneRedundancyValidationResult.Unknown

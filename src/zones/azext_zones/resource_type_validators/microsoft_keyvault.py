@@ -20,10 +20,10 @@ class microsoft_keyvault:
             "Validating Microsoft.keyvault resource type: %s",
             resourceSubType)
 
-        match resourceSubType:
-            case 'vaults':
-                # Key vaults are zone redundant by default
-                # https://learn.microsoft.com/azure/key-vault/general/disaster-recovery-guidance#failover-across-regions
-                return ZoneRedundancyValidationResult.Always
+        # Key Vaults
+        if resourceSubType == 'vaults':
+            # Key vaults are zone redundant by default
+            # https://learn.microsoft.com/azure/key-vault/general/disaster-recovery-guidance#failover-across-regions
+            return ZoneRedundancyValidationResult.Always
 
         return ZoneRedundancyValidationResult.Unknown

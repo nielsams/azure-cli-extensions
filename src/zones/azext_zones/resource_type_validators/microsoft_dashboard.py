@@ -20,12 +20,12 @@ class microsoft_dashboard:
             "Validating Microsoft.dashboard resource type: %s",
             resourceSubType)
 
-        match resourceSubType:
-            case 'grafana':
-                zr = resource.get('properties', {}).get('zoneRedundancy', '')
-                if zr == 'Enabled':
-                    return ZoneRedundancyValidationResult.Yes
-                else:
-                    return ZoneRedundancyValidationResult.No
+        # Managed Grafana instances
+        if resourceSubType == 'grafana':
+            zr = resource.get('properties', {}).get('zoneRedundancy', '')
+            if zr == 'Enabled':
+                return ZoneRedundancyValidationResult.Yes
+            else:
+                return ZoneRedundancyValidationResult.No
 
         return ZoneRedundancyValidationResult.Unknown

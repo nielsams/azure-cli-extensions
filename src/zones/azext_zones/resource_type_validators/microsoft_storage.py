@@ -20,13 +20,13 @@ class microsoft_storage:
             "Validating Microsoft.Storage resource type: %s",
             resourceSubType)
 
-        match resourceSubType:
-            case 'storageaccounts':
-                # Storage accounts are zone redundant if they are in the ZRS
-                # SKU
-                if resource['sku']['name'] == 'Standard_ZRS':
-                    return ZoneRedundancyValidationResult.Yes
-                else:
-                    return ZoneRedundancyValidationResult.No
+        # Storage Accounts
+        if resourceSubType =='storageaccounts':
+            # Storage accounts are zone redundant if they are in the ZRS
+            # SKU
+            if resource['sku']['name'] == 'Standard_ZRS':
+                return ZoneRedundancyValidationResult.Yes
+            else:
+                return ZoneRedundancyValidationResult.No
 
         return ZoneRedundancyValidationResult.Unknown

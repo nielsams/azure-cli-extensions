@@ -20,6 +20,7 @@ class microsoft_containerinstance:
             "Validating Microsoft.containerinstance resource type: %s",
             resourceSubType)
 
+        # Container Instance Container Groups
         match resourceSubType:
             case 'containergroups':
                 # Container groups of container instances are zonal resources, so they are never zone redundant

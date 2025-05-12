@@ -20,15 +20,15 @@ class microsoft_kusto:
             "Validating Microsoft.kusto resource type: %s",
             resourceSubType)
 
-        match resourceSubType:
-            case 'clusters':
-                # AKS clusters are zone redundant if the node pools are spread across multiple zones
-                # Zone Redundancy on AKS involves a lot of configuration steps, testing is required beyond this script.
-                # https://learn.microsoft.com/azure/aks/availability-zones-overview
-                zones = resource.get('zones') or []
-                if len(zones) > 1:
-                    return ZoneRedundancyValidationResult.Yes
-                else:
-                    return ZoneRedundancyValidationResult.No
+        # Kusto Clusters
+        if resourceSubType == 'clusters':
+            # AKS clusters are zone redundant if the node pools are spread across multiple zones
+            # Zone Redundancy on AKS involves a lot of configuration steps, testing is required beyond this script.
+            # https://learn.microsoft.com/azure/aks/availability-zones-overview
+            zones = resource.get('zones') or []
+            if len(zones) > 1:
+                return ZoneRedundancyValidationResult.Yes
+            else:
+                return ZoneRedundancyValidationResult.No
 
         return ZoneRedundancyValidationResult.Unknown
